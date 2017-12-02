@@ -2,7 +2,7 @@
   "name": "yadage-js",
   "homepage": "https://github.com/lukasheinrich/yadage-js",
   "description": "javascript client library for yadage workflows",
-  "main": "yadage.js",
+  "main": "yadage-js.js",
   "keywords": [
     "yadage",
     "workflows",
