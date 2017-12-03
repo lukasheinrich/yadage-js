@@ -101,6 +101,7 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
 
         cytodata.nodes.push({
           data: {
+            details: this,
             id: this.id,
             label: is_special ? '' : this.name,
             parent: absstage
@@ -202,14 +203,16 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
     collapse_api: undefined,
 
     nodeSelectCallback: function(evt){
+      console.log('why?')
       console.log(evt)
     },
 
     redraw_graph: function(data){
+      this.yadage_state = data || this.yadage_state
       this.cy.startBatch()
       this.cy.remove('node')
 
-      var cd = this.yadage2cytodata(data)
+      var cd = this.yadage2cytodata(this.yadage_state)
       this.cy.add(cd.edges.concat(cd.nodes))
       this.cy.layout(this.layout).run()
 
@@ -223,7 +226,7 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
       fit: true
     },
 
-    initialize_graph: function(data, element){
+    initialize_graph: function(element){
 
 
 
@@ -235,7 +238,7 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
         autounselectify: true,
 
         style: this.cystyle(),
-        elements: this.yadage2cytodata(data)
+        elements: []
 
       });
 

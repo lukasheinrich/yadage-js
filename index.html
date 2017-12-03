@@ -37,12 +37,26 @@
 
 
         console.log("AJAX" + $)
-        $.ajax({url: 'big.json',success: function(data){
+        var url = 'work/_yadage/yadage_snapshot_workflow.json'
+        var url = 'big.json'
+        $.ajax({url: url,success: function(data){
 
           test_data = data;
 
           require(["yadage-js"],function(yadage){
-            yadage.initialize_graph(data, $("#cy"))
+            yadage.nodeSelectCallback = function(evt){
+              var details = evt.target.data().details
+              if (details) {
+              var html = `
+                <dl>
+                  <dt>Name</dt>
+                  <dd>${details.name}</dd>
+                </dl>
+              `
+              $('#yadage-task').html(html)
+            }}
+            yadage.initialize_graph($("#yadage-viz"))
+            yadage.redraw_graph(data)
         })}})
       })
 
@@ -52,10 +66,10 @@
         font-family: helvetica;
         font-size: 14px;
       }
-      #cy {
-        width: 100%;
-        height: 100%;
-        position: absolute;
+      #yadage-viz {
+        width: 50%;
+        height: 50%;
+        border: 1px solid black;
         left: 0;
         top: 0;
         z-index: 999;
@@ -69,7 +83,16 @@
   </head>
 
   <body>
-    <div id="cy"></div>
+    <div>
+      <div>
+        <button onclick="require('yadage-js').redraw_graph(test_data);">redraw</button>
+        <button onclick="require('yadage-js').relayout();">relayout</button>
+        <button onclick="require('yadage-js').collapse_api.collapseAll();">collapse</button>
+        <button onclick="require('yadage-js').collapse_api.expandAll();">expand</button>
+      </div>
+      <div id="yadage-viz"></div>
+      <div id="yadage-task"></div>
+    </div>
   </body>
 
 </html>
