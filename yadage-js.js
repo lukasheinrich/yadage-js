@@ -11,6 +11,95 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
 
   return {
 
+    rest_controller: {
+      server: undefined,
+
+      connect: function(server){
+        this.server = server
+      },
+
+      //read
+
+      state: function(){
+        return $.ajax({
+          method: 'GET',
+          url: this.server + '/state'+'?_=' + new Date().getTime(),
+        })
+      },
+
+
+      node: function(nodeid){
+        return $.ajax({
+          method: 'GET',
+          url: this.server + '/state/node/'+nodeid,
+        })
+      },
+
+
+      rule: function(ruleid){
+        return $.ajax({
+          method: 'GET',
+          url: this.server + '/state/rule/'+ruleid,
+        })
+      },
+
+
+      applicable_rules: function(){
+        return $.ajax({
+          method: 'GET',
+          url: this.server + '/ctrl/read/applicable_rules',
+        })
+      },
+
+      submittable_nodes: function(){
+        return $.ajax({
+          method: 'GET',
+          url: this.server + '/ctrl/read/submittable_nodes',
+        })
+      },
+
+
+      //write
+      reset_nodes: function(nodes){
+        console.log('reset_nodes from ' + this.server)
+      },
+
+      submit_nodes: function(nodes){
+        return $.ajax({
+          type: "POST",
+          contentType: "application/json; charset=utf-8",
+          url: "/ctrl/write/submit_nodes",
+          data: JSON.stringify({nodeids: nodes}),
+          dataType: "json"
+        });
+
+        console.log('submit_nodes ' + nodes + ' to ' + this.server)
+      },
+
+      reset_nodes: function(nodes){
+        return $.ajax({
+          type: "POST",
+          contentType: "application/json; charset=utf-8",
+          url: "/ctrl/write/reset_nodes",
+          data: JSON.stringify({nodeids: nodes}),
+          dataType: "json"
+        });
+      },
+
+      apply_rules: function(rules){
+        return $.ajax({
+          type: "POST",
+          contentType: "application/json; charset=utf-8",
+          url: "/ctrl/write/apply_rules",
+          data: JSON.stringify({ruleids: rules}),
+          dataType: "json"
+        });
+
+        console.log('apply_rules   ' + rules + ' to ' + this.server)
+      },
+    },
+
+
     yadage2cytodata: function(data){
       var cytodata = {
         nodes: [],
@@ -49,6 +138,8 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
         var label = isNaN(parseInt(last_part))? last_part : "idx: " + last_part;
 
         var scope_data = {data: {
+          yadage_type: 'scope',
+          details: this,
           id: v,
           label: label
         },
@@ -70,6 +161,11 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
 
       stages.forEach(function(v,v,s){
         cytodata.nodes.push({data: {
+          yadage_type: 'stage',
+          details: {
+            name: v.split('#')[1],
+            scope: v.split('#')[0]
+          },
           id: v,
           label: v.split('#')[1],
           parent: v.split('#')[0] != '' ? v.split('#')[0] : undefined
@@ -101,6 +197,7 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
 
         cytodata.nodes.push({
           data: {
+            yadage_type: 'node',
             details: this,
             id: this.id,
             label: is_special ? '' : this.name,
@@ -207,6 +304,10 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
       console.log(evt)
     },
 
+    stageSelectCallback: function(evt){
+      console.log('stage selected')
+    },
+
     redraw_graph: function(data){
       this.yadage_state = data || this.yadage_state
       this.cy.startBatch()
@@ -242,7 +343,8 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
 
       });
 
-      this.cy.on("click",'node[node_type!="group"]',this.nodeSelectCallback);
+      this.cy.on("click",'node[yadage_type = "node"]',this.nodeSelectCallback);
+      this.cy.on("click",'node[yadage_type = "stage"]',this.stageSelectCallback);
 
       this.collapse_api = this.cy.expandCollapse({
         layoutBy: this.layout,
