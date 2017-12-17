@@ -68,7 +68,7 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
         return $.ajax({
           type: "POST",
           contentType: "application/json; charset=utf-8",
-          url: "/ctrl/write/submit_nodes",
+          url: this.server + "/ctrl/write/submit_nodes",
           data: JSON.stringify({nodeids: nodes}),
           dataType: "json"
         });
@@ -80,7 +80,7 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
         return $.ajax({
           type: "POST",
           contentType: "application/json; charset=utf-8",
-          url: "/ctrl/write/reset_nodes",
+          url: this.server + "/ctrl/write/reset_nodes",
           data: JSON.stringify({nodeids: nodes}),
           dataType: "json"
         });
@@ -90,7 +90,7 @@ define(["jquery","cytoscape","cytoscape-dagre","dagre","cytoscape-expand-collaps
         return $.ajax({
           type: "POST",
           contentType: "application/json; charset=utf-8",
-          url: "/ctrl/write/apply_rules",
+          url: this.server + "/ctrl/write/apply_rules",
           data: JSON.stringify({ruleids: rules}),
           dataType: "json"
         });
